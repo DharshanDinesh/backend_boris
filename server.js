@@ -6,7 +6,7 @@ const routerBill = require('./routes/route_billList'); // No .js extension neede
 const routerCurrency = require('./routes/route_currency')
 const routerSource = require('./routes/route_source')
 const routerHotel = require('./routes/route_hotel')
-
+const routerAccount = require('./routes/route_accounts')
 const app = express();
 const PORT = 3000;
 
@@ -24,6 +24,7 @@ app.use('/bill', routerBill);
 app.use('/source', routerSource);
 app.use('/hotel', routerHotel);
 app.use('/currency', routerCurrency);
+app.use('/account', routerAccount);
 
 // Start the server
 app.listen(PORT, () => {

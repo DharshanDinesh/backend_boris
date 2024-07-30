@@ -1,84 +1,63 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // Define a Mongoose schema and model
 const billSchema = new mongoose.Schema({
-    "Income_From_(Stay_Name)": {
-        type: String,
-        required: [true, 'Income From (Stay Name) is required'],
-    },
-    "Date_Of_Booking": {
-        type: String,
-        required: [true, 'Date Of Booking is required'],
-    },
-    "Tenant_Name": {
-        type: String,
-        required: [true, 'Tenant Name is required'],
-    },
-    "Booking_From": {
-        type: String,
-        required: [true, 'Booking From is required'],
-    },
-    "Room_No": String,
-    "Share_Percentage": {
-        type: Number,
-        required: [true, 'Share Percentage is required'],
-        validate: {
-            validator: function (value) {
-                return value !== 0; // Custom validation function
-            },
-            message: props => `${props.value} is not a valid age! Age cannot be 0.`
-        }
-    },
-    "Balance_Amount": {
-        type: Number,
-        required: [true, 'Balance Amount is required'],
-        validate: {
-            validator: function (value) {
-                return value !== 0; // Custom validation function
-            },
-            message: props => `${props.value} cannot be zero`
-        }
-    },
-    "Adavance_Amount": Number,
-    "Extra_Amount": Number,
-    "Extra_Amount_Detail": String,
-    "Expenses": {
-        type: Number,
-        required: [true, 'Expenses is required'],
-    },
-    "Expenses_Explanation": String,
-    "Debited_Amount": Number,
-    "Amount_Debited_from": String,
-    "Amount_Credited_to": String,
-    "Credited_Amount": Number,
-    "Amount_Received_As_(Rs_/_Euro)": String,
-    "Is_GST_Included": {
+    isIncome: {
         type: Boolean,
-        required: [true, 'Is GST Included is required'],
     },
-    "GST_Percentage": {
+
+    tenant_name: {
+        type: String,
+    },
+    stay_name: {
+        type: String,
+
+    },
+    date_of_booking: {
+        type: [String, String],
+    },
+    booking_from: {
+        type: String,
+    },
+    room_no: String,
+    share_percentage: {
         type: Number,
-        required: [true, 'GST Percentage is required'],
-        validate: {
-            validator: function (value) {
-                if (this.Is_GST_Included) {
-                    return value !== 0;
-                } // Custom validation function
-            },
-            message: props => `GST Percentage cant be ${props.value}.`
-        }
     },
-    "Final_Amount": {
+    adavance_amount: Number,
+    balance_amount: {
         type: Number,
-        required: [true, 'Final Amount is required'],
-        validate: {
-            validator: function (value) {
-                return value !== 0; // Custom validation function
-            },
-            message: props => `${props.value} cannot be zero`
-        }
     },
+    extra_amount: Number,
+    extra_amount_detail: String,
+    total_amount: Number,
+
+    is_cash_received: Boolean,
+    amount_credited_to: String,
+    credited_amount: Number,
+    currency_received: String,
+
+    gst_transction: {
+        type: Boolean,
+    },
+    gst_percentage: {
+        type: Number,
+    },
+    gst_amount: Number,
+    tds_amount: Number,
+    tcs_amount: Number,
+    final_amount: Number,
+    final_amount_after_share: Number,
+
+    total_expense: {
+        type: Number,
+    },
+    expense_date: String,
+    expenses_explanation: String,
+    debited_Amount: Number,
+    amount_debited_from: String,
+    expense_for: String,
+    gst_amount_inward: Number,
+    gst_transction_expense: Boolean,
 });
 
-module.exports = mongoose.model('Item', billSchema);
-
+module.exports = mongoose.model("Item", billSchema);
