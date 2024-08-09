@@ -5,10 +5,11 @@ const router = express.Router();
 
 // Get all todos
 router.post("/", async (req, res) => {
-    const { name } = req.body;
+    const { name, rooms
+    } = req.body;
     try {
         const newTodo = new Helper({
-            name,
+            name, rooms
         });
         const savedTodo = await newTodo.save();
         res.status(201).json(savedTodo);
