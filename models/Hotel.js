@@ -6,7 +6,10 @@ const hotelSource = new mongoose.Schema({
         type: String,
         required: true,
     },
-    rooms: [String]
+    rooms: [{
+        name: String,
+        _id: mongoose.Schema.Types.ObjectId,
+    }]
 });
 
 module.exports = mongoose.model('hotelSource', hotelSource) 
