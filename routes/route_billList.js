@@ -38,5 +38,18 @@ routerBill.put('/:id', async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 });
+routerBill.delete("/:id", async (req, res) => {
+    try {
+        const deletedTodo = await Item.findByIdAndDelete(req.params.id);
+        if (deletedTodo) {
+            res.json({ message: "item  deleted" });
+        } else {
+            res.status(404).json({ message: "Item not found" });
+        }
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 
 module.exports = routerBill
