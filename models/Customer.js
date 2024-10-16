@@ -8,6 +8,8 @@ const CustomerSchema = new mongoose.Schema({
     checkIn: Date,
     dateOfEntry: Date,
     checkOut: Date,
+    roomNumber: String,
+    stayName: String,
     file: [{
         url: String,
         fileType: String,

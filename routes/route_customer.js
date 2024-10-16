@@ -5,10 +5,10 @@ const router = express.Router();
 
 // Get all todos
 router.post("/", async (req, res) => {
-    const { name, address, phone, checkIn, checkOut, file, dateOfEntry } = req.body;
+    const { name, address, phone, checkIn, checkOut, file, dateOfEntry, roomNumber, stayName } = req.body;
     try {
         const newTodo = new Currency({
-            name, address, phone, checkIn, checkOut, file, dateOfEntry
+            name, address, phone, checkIn, checkOut, file, dateOfEntry, roomNumber, stayName
         });
         const savedTodo = await newTodo.save();
         res.status(201).json(savedTodo);
