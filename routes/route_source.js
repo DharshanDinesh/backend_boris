@@ -5,10 +5,11 @@ const router = express.Router();
 
 // Get all todos
 router.post("/", async (req, res) => {
-    const { name } = req.body;
+    const { name, commission } = req.body;
     try {
         const newTodo = new Helper({
             name,
+            commission
         });
         const savedTodo = await newTodo.save();
         res.status(201).json(savedTodo);
@@ -38,12 +39,12 @@ router.delete("/:id", async (req, res) => {
 });
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, commission } = req.body;
 
     try {
         const updatedTodo = await Helper.findByIdAndUpdate(
             id,
-            { name },
+            { name, commission },
             { new: true, runValidators: true } // Options to return the updated document and run validation
         );
 
