@@ -3,49 +3,115 @@ const Item = require('../models/BillListV2');
 
 const routerBillV2 = express.Router();
 
-// GET all bills with filtering and sorting options
+// Helper function to parse DD/MM/YYYY date string to Date object
+const parseDate = (dateStr) => {
+    if (!dateStr) return null;
+    const [day, month, year] = dateStr.split('/');
+    return new Date(year, month - 1, day);
+};
+
+// Helper function to compare dates in DD/MM/YYYY format
+const isDateInRange = (dateStr, startStr, endStr) => {
+    if (!dateStr || !startStr || !endStr) return true;
+    const date = parseDate(dateStr);
+    const start = parseDate(startStr);
+    const end = parseDate(endStr);
+    return date >= start && date <= end;
+};
+
+// GET all bills with filtering, sorting, and pagination
 routerBillV2.get('/', async (req, res) => {
     try {
         const { 
-            startDate, 
-            endDate, 
-            stay_name, 
+            page = 1,
+            limit = 10,
+            startDateEntry,
+            endDateEntry,
+            startDateBooking,
+            endDateBooking,
+            stay_name,
             booking_from,
+            isIncome,
+            gst_transction,
             sortBy = 'date_of_entry',
             order = 'desc'
         } = req.query;
 
+        // Parse pagination parameters
+        const pageNum = parseInt(page);
+        const limitNum = parseInt(limit);
+        const skip = (pageNum - 1) * limitNum;
+
         let query = {};
 
-        // Date range filter
-        if (startDate && endDate) {
-            query.date_of_entry = {
-                $gte: startDate,
-                $lte: endDate
-            };
+        // Income/Expense filter
+        if (isIncome !== undefined && isIncome !== null && isIncome !== '') {
+            query.isIncome = isIncome === 'true' || isIncome === true;
         }
 
-        // Stay name filter
+        // GST Transaction filter
+        if (gst_transction !== undefined && gst_transction !== null && gst_transction !== '') {
+            query.gst_transction = gst_transction === 'true' || gst_transction === true;
+        }
+
+        // Stay name filter (supports multiple values)
         if (stay_name) {
-            query.stay_name = stay_name;
+            const stays = Array.isArray(stay_name) ? stay_name : stay_name.split(',');
+            query.stay_name = { $in: stays };
         }
 
-        // Booking source filter
+        // Booking source filter (supports multiple values)
         if (booking_from) {
-            query.booking_from = booking_from;
+            const sources = Array.isArray(booking_from) ? booking_from : booking_from.split(',');
+            query.booking_from = { $in: sources };
         }
 
-        const items = await Item.find(query)
+        // Fetch all matching documents for date filtering
+        let items = await Item.find(query)
             .sort({ [sortBy]: order === 'desc' ? -1 : 1 });
 
+        // Apply date filters in JavaScript (since dates are stored as strings in DD/MM/YYYY format)
+        if (startDateEntry && endDateEntry) {
+            items = items.filter(item => 
+                isDateInRange(item.date_of_entry, startDateEntry, endDateEntry)
+            );
+        }
+
+        if (startDateBooking && endDateBooking) {
+            items = items.filter(item => {
+                if (!item.date_of_booking || !Array.isArray(item.date_of_booking)) return false;
+                
+                // Check if any date in booking range overlaps with filter range
+                const bookingStart = item.date_of_booking[0];
+                const bookingEnd = item.date_of_booking[1] || bookingStart;
+                
+                const filterStart = parseDate(startDateBooking);
+                const filterEnd = parseDate(endDateBooking);
+                const itemStart = parseDate(bookingStart);
+                const itemEnd = parseDate(bookingEnd);
+                
+                // Check for overlap: item starts before filter ends AND item ends after filter starts
+                return itemStart <= filterEnd && itemEnd >= filterStart;
+            });
+        }
+
+        // Calculate total values from filtered results
         const totalNetProfit = items.reduce((total, item) => {
             return total + Number(item.net_profit || 0);
         }, 0);
 
+        const totalCount = items.length;
+
+        // Apply pagination
+        const paginatedItems = items.slice(skip, skip + limitNum);
+
         res.json({ 
-            items,
+            items: paginatedItems,
             totalNetProfit,
-            count: items.length
+            count: totalCount,
+            page: pageNum,
+            limit: limitNum,
+            totalPages: Math.ceil(totalCount / limitNum)
         });
     } catch (err) {
         res.status(500).json({ 
