@@ -43,4 +43,4 @@ const billSchema = new mongoose.Schema({
     gst_transction_expense: Boolean,
 });
 
-module.exports = mongoose.model("Item", billSchema);
+module.exports = mongoose.model("Items", billSchema);

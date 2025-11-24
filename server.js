@@ -9,6 +9,7 @@ const routerHotel = require('./routes/route_hotel')
 const routerAccount = require('./routes/route_accounts')
 const routerLogin = require('./routes/route_user')
 const routerCustomer = require('./routes/route_customer')
+const routerBillV2 = require('./routes/route_billListV2'); // No .js extension needed
 
 require('dotenv').config();
 
@@ -29,6 +30,7 @@ mongoose.connect(dbUri, { useNewUrlParser: true, useUnifiedTopology: true })
 
 app.use('/login', routerLogin);
 app.use('/bill', routerBill);
+app.use('/billv2', routerBillV2);
 app.use('/source', routerSource);
 app.use('/hotel', routerHotel);
 app.use('/currency', routerCurrency);
